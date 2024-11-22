@@ -1,62 +1,54 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const filtersData = [
-  { id: '0', label: 'All Stories' },
-  { id: '1', label: 'Abortion' },
-  { id: '2', label: 'Miscarriage' },
-  { id: '3', label: 'Infertility' },
-  { id: '4', label: 'Live Birth' },
-  { id: '5', label: 'Termination of Wanted Pregnancy' },
+const tagList = [
+  'All Stories',
+  'Abortion',
+  'Miscarriage',
+  'Infertility',
+  'Live Birth',
+  'Termination of Wanted Pregnancy',
 ];
 
-export default function Filters({ navigation }) {
-  const [selectedFilters, setSelectedFilters] = useState([]); // Track selected filters
+export default function Filters({ navigation, route }) {
+  const [selectedTags, setSelectedTags] = useState(['All Stories']);
 
-  const toggleFilter = (filter) => {
-    if (filter === 'All Stories') {
-      // If "All Stories" is selected, clear all other filters
-      setSelectedFilters(['All Stories']);
+  const toggleTag = (tag) => {
+    if (tag === 'All Stories') {
+      setSelectedTags(['All Stories']); // Reset to show all stories
     } else {
-      // Deselect "All Stories" if other filters are selected
-      if (selectedFilters.includes('All Stories')) {
-        setSelectedFilters([filter]);
-      } else {
-        // Toggle other filters
-        if (selectedFilters.includes(filter)) {
-          setSelectedFilters(selectedFilters.filter((item) => item !== filter));
-        } else {
-          setSelectedFilters([...selectedFilters, filter]);
-        }
-      }
+      setSelectedTags((prevTags) =>
+        prevTags.includes(tag)
+          ? prevTags.filter((t) => t !== tag)
+          : [...prevTags.filter((t) => t !== 'All Stories'), tag]
+      );
     }
   };
 
-  // Apply filters and go back to Home
   const applyFilters = () => {
-    navigation.navigate('Home', { filters: selectedFilters });
+    navigation.navigate('Home', { filters: selectedTags });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Filter Story Tags</Text>
-      <View style={styles.filtersContainer}>
-        {filtersData.map((filter) => (
+      <Text style={styles.heading}>Filter Story Tags</Text>
+      <View style={styles.tagsContainer}>
+        {tagList.map((tag) => (
           <TouchableOpacity
-            key={filter.id}
+            key={tag}
             style={[
-              styles.filterButton,
-              selectedFilters.includes(filter.label) && styles.selectedFilterButton,
+              styles.tag,
+              selectedTags.includes(tag) ? styles.tagSelected : null,
             ]}
-            onPress={() => toggleFilter(filter.label)}
+            onPress={() => toggleTag(tag)}
           >
             <Text
               style={[
-                styles.filterButtonText,
-                selectedFilters.includes(filter.label) && styles.selectedFilterButtonText,
+                styles.tagText,
+                selectedTags.includes(tag) ? styles.tagTextSelected : null,
               ]}
             >
-              {filter.label}
+              {tag}
             </Text>
           </TouchableOpacity>
         ))}
@@ -74,39 +66,40 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
-  title: {
+  heading: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#800000',
     marginBottom: 20,
   },
-  filtersContainer: {
+  tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 10,
     marginBottom: 20,
   },
-  filterButton: {
-    backgroundColor: '#ddd',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+  tag: {
+    backgroundColor: '#e0e0e0',
     borderRadius: 20,
-    marginRight: 10,
-    marginBottom: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    margin: 5,
   },
-  selectedFilterButton: {
+  tagSelected: {
     backgroundColor: '#800000',
   },
-  filterButtonText: {
+  tagText: {
+    fontSize: 14,
     color: '#555',
-    fontWeight: 'bold',
   },
-  selectedFilterButtonText: {
+  tagTextSelected: {
     color: '#fff',
+    fontWeight: 'bold',
   },
   applyButton: {
     backgroundColor: '#800000',
-    paddingVertical: 15,
     borderRadius: 10,
+    padding: 15,
     alignItems: 'center',
   },
   applyButtonText: {

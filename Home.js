@@ -1,48 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BottomNav from './BottomNav';
-
-const stories = [
-  {
-    id: '1',
-    username: 'storyteller_213',
-    time: '2hr',
-    title: 'This is my abortion story',
-    description:
-      'I was 22 and had been dating my boyfriend for 3 years when I first thought I might be pregnant...',
-    tags: ['Abortion', 'BIPOC', '1st trimester'],
-  },
-  {
-    id: '2',
-    username: 'Binks<3',
-    time: '3d',
-    title: 'My and my husband’s journey with IVF',
-    description:
-      'My husband and I talked about wanting kids for years before deciding it was the right time...',
-    tags: ['Infertility', '2nd trimester'],
-  },
-];
+import { UserContext } from './UserContext';
 
 export default function Home({ navigation, route }) {
+  const { stories } = useContext(UserContext); // Fetch stories from context
   const [searchText, setSearchText] = useState('');
   const [filteredStories, setFilteredStories] = useState(stories);
 
+  // Update filtered stories when filters are applied
   useEffect(() => {
     if (route.params?.filters) {
       const selectedFilters = route.params.filters;
+
       if (selectedFilters.includes('All Stories')) {
-        setFilteredStories(stories); // Show all stories
+        // Show all stories
+        setFilteredStories(stories);
       } else {
-        setFilteredStories(
-          stories.filter((story) =>
-            story.tags.some((tag) => selectedFilters.includes(tag))
-          )
+        // Filter stories based on selected tags
+        const updatedStories = stories.filter((story) =>
+          story.tags.some((tag) => selectedFilters.includes(tag))
         );
+        setFilteredStories(updatedStories);
       }
     }
-  }, [route.params?.filters]);
+  }, [route.params?.filters, stories]);
 
+  // Update filtered stories when search text changes
   useEffect(() => {
     if (searchText.trim() === '') {
       setFilteredStories(stories);
@@ -54,8 +39,9 @@ export default function Home({ navigation, route }) {
         )
       );
     }
-  }, [searchText]);
+  }, [searchText, stories]);
 
+  // Render individual story cards
   const renderStoryCard = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
@@ -117,7 +103,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingTop: 40, // Ensure content is not pushed under the status bar
+    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',
@@ -159,7 +145,7 @@ const styles = StyleSheet.create({
     color: '#800000',
   },
   storyList: {
-    paddingBottom: 60, // Prevent content from overlapping the navigation bar
+    paddingBottom: 60,
   },
   card: {
     backgroundColor: '#fff',
